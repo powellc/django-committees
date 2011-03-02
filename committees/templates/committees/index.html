@@ -1,0 +1,20 @@
+{% extends "gov/base.html" %}
+{% block page-class %}gov{% endblock %}
+{% block title %}Governance at {% endblock %}
+
+{% block content %}
+{% load humanize markup typogrify %}
+  <div class="grid_12">
+    <h2>Governance</h2>
+  </div>
+
+  {% if board %}
+  <h3>Governing board</h3>
+  <ol>
+    {% for term in board %}
+	<li><a href="{{term.get_absolute_url}}">{{term.office.title}} {{term.person}}</a> {{term.start_date|date:"Y"}}</li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+{% endblock %}
+

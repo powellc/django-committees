@@ -1,0 +1,23 @@
+{% extends "gov/base.html" %}
+{% block page-class %}gov{% endblock %}
+{% block title %}{{term}} at {% endblock %}
+
+{% block content %}
+{% load humanize markup typogrify %}
+  <div class="grid_12">
+    <h2>Governance</h2>
+  </div>
+
+  {% if term %}
+  <h3>Position: {{term.office.title}}</h3>
+  <p>{{term.start_date.year}} to {{term.end_date.year}}</p>
+  <h4>Currently held by</h4>
+  <ul>
+      <li>{{term.person}}</li>
+      <li>Phone: {{term.person.phone}}</li>
+      <li>Email: {{term.person.email|urlize}}</li>
+  </ul>
+  {% endif %}
+{% endblock %}
+
+

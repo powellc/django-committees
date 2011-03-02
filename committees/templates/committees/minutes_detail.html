@@ -1,0 +1,19 @@
+{% extends "gov/base.html" %}
+{% block page-class %}gov{% endblock %}
+{% load humanize markup typogrify %}
+{% block title %}{{object.title}} meeting of {{object.start|naturalday}} at {% endblock %}
+
+{% block content %}
+  <div class="grid_12">
+    <h2>Governance</h2>
+  </div>
+
+  {% if object %}
+  <h3>Minutes of the {{object.meeting.title}} meeting</h3>
+  <div class="minutes">
+  <p>{{object.meeting.start|naturalday}} {{object.meeting.start|time:"h:m"}}</p>
+  {{object.content|typogrify|markdown}}
+  </div>
+  {% endif %}
+{% endblock %}
+

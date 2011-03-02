@@ -1,0 +1,36 @@
+{% extends "sermon/base.html" %}
+{% block page-class %}sermons{% endblock %}
+{% block title %}Sermon: {{sermon.title}} at {% endblock %}
+{% load markup humanize typogrify %}
+
+{% block body %}
+<div class="grid_12">
+<h2>{{sermon.title}}</h2>
+<h3 class="alt">A sermon by {{sermon.speaker}}</h3>
+<h3>{{sermon.date|naturalday}}</h3>
+</div>
+
+<div class="grid_8 sermon-body">
+  <dl class="audio-player" id="sermon-audio-{{sermon.id}}">
+    <dt>Watch the sermon</dt>
+    <dd>  
+	  This could have an audio player.
+    </dd>
+  </dl>
+  {{sermon.body|typogrify|markdown}}
+  <p><a href="{% url sr-index %}">Read more sermons</a></p>
+</div>
+
+<div id="sidebar" class="grid_3 box ">
+<h2>Readings</h2>
+<ol>
+{% for reading in sermon.readings.all %}
+  <li><h5>From {{reading.source}}</h5>
+  <div class="reading" id="reading-{{reading.id}}">
+    {{reading.text|typogrify|markdown}}
+  </div></li>
+{% endfor %}
+</ol>
+</div>
+
+{% endblock %}
