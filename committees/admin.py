@@ -2,7 +2,7 @@ from django.contrib import admin
 from committees.models import *
 
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('person', 'office', 'group', 'start_date', 'end_date', 'alternate','is_active',)
+    list_display = ('person', 'office', 'group', 'start', 'end', 'alternate','is_active',)
     search_fields = ('person','group',)
     list_filter = ( 'person','group',  )
 
@@ -13,7 +13,7 @@ class TermAdmin(admin.ModelAdmin):
 
 admin.site.register(Term, TermAdmin)
     
-admin.site.register(Bylaws)
+admin.site.register(GroupType)
 admin.site.register(Group)
 admin.site.register(Office)
 admin.site.register(Person)

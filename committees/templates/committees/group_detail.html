@@ -1,6 +1,6 @@
-{% extends "gov/base.html" %}
+{% extends "committees/base.html" %}
 {% block page-class %}gov{% endblock %}
-{% block title %}{{term}} at {% endblock %}
+{% block title %}{{object}} at {% endblock %}
 
 {% block content %}
 {% load humanize markup typogrify %}
@@ -15,18 +15,19 @@
   </div>
 
   {% if object %}
-  <h3>{{object.title}}</h3>
+  <h3>{{object}}</h3>
   {{object.description|typogrify|markdown}}
   {% if members or object.members %}
-  <h3>Members</h4>
+  <h3>Members</h3>
   <ul class="board">
-    {% if members %}
-    {% for m in members %}
-    <li>{% if m.alternate %}<span class="alt">Alternate</span> {% endif %}{{m.office.title}}<a href="{{m.get_absolute_url}}"> {{m.person}}</a> {{m.start_date|date:"Y"}}</li>
+    {% if object.current_terms %}
+    {% for t in object.current_terms %}
+    <li>{% if t.alternate %}<span class="alt">Alt.</span> {% endif %}{{t.office.title}}<a href="{{t.get_absolute_url}}"> {{t.person}}</a> {{m.start_date|date:"Y"}}</li>
     {% endfor %}
-    {% else %}
-    {% for p in object.members %}
-    <li><a href="{{p.get_absolute_url}}"> {{p}}</a></li>
+    {% endif %}
+    {% if object.members.all %}
+    {% for p in object.members.all %}
+    <li>{% if p.email %}<a href="mailto:{{p.email}}">{% endif %}{{p}}{% if p.email %}</a>{% endif %}</li>
     {% endfor %}
     {% endif %}
   </ul>

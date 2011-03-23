@@ -1,20 +1,24 @@
-{% extends "gov/base.html" %}
+{% extends "committees/base.html" %}
 {% block page-class %}gov{% endblock %}
 {% block title %}Governance at {% endblock %}
 
 {% block content %}
-{% load humanize markup typogrify %}
+{% load humanize markup typogrify committee_tags %}
   <div class="grid_12">
-    <h2>Governance</h2>
+	  <h2>Governance</h2>
   </div>
 
-  {% if board %}
-  <h3>Governing board</h3>
-  <ol>
-    {% for term in board %}
-	<li><a href="{{term.get_absolute_url}}">{{term.office.title}} {{term.person}}</a> {{term.start_date|date:"Y"}}</li>
+    {% get_committee_groups active order 10 as board %}
+    {% if board %}
+    <h3>{{board}}</h3>
+    {% for t in board.current_terms %}
+    {% if forloop.first %}<ul class="board">{% endif %}
+        <li>{% if t.office %} <span class="office">{{t.office.title}}</span><br/> {% endif %}<span class="person">{{t.person}}</span>{% if t.alternate %} <span class="alt">Alt.</span>{% endif %}</li>
+    {% if forloop.last %}</ul>{% endif %}
     {% endfor %}
-  </ol>
+    {% endif %}
+
+  {% if objects %}
   {% endif %}
 {% endblock %}
 

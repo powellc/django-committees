@@ -1,22 +1,31 @@
-{% extends "gov/base.html" %}
+{% extends "committees/base.html" %}
 {% block page-class %}gov{% endblock %}
-{% load humanize markup typogrify %}
+{% load humanize markup typogrify committee_tags %}
 {% block title %}{{object.title}} meeting of {{object.start|naturalday}} at {% endblock %}
 
-{% block content %}
-  <div class="grid_12">
+{% block body %}
+  <div class="grid_12 last">
     <h2>Governance</h2>
   </div>
 
+  <div class="grid_8" >
   {% if object %}
-  <h3>{{object.title}} meeting</h3>
-  <p>{{object.start|naturalday}} {{object.start|time:"h:m"}}</p>
-  {% if object.meeting.minutes_set.all %}
-  {% for m in object.meeting.minutes_set.all %}
-  <p><a href="{{m.get_absolute_url}}">Minutes</a></p>
-  {% endfor %}
-  {% endif %}
+  <h3>{{object.title}} {% if object.minutes_set.all %}Minutes{% else %}Agenda{% endif %}</h3>
+  <h3>{{object.start|naturalday}} {{object.start|time:"f a"}}</h3>
 
+  {% get_committee_minutes for object as minutes %}
+
+  {% if minutes %}  
+  {% if minutes.call_to_order %}<p>Meeting called to order at {{minutes.call_to_order|time:"f a"}} in {{object.location}}.</p>{% endif%}
+
+  {{minutes.rendered_content|typogrify}}
+  {% if object.get_next_meeting %}
+  <p>Next meeting at {{ object.get_next_meeting.start|naturalday }} at {{ object.get_next_meeting.start|time:"f a" }}.</p>
+  <p><a href="{{object.get_next_meeting.get_absolute_url}}">View next meeting</a></p>
+  {% endif %}
+  {% if minutes.adjournment %}<p>Meeting adjourned at {{minutes.adjournment|time:"f a"}}.</p>{% endif %}
+
+  {% else %}
   {% if object.meeting.agenda %}
   <div class="agenda">
   <h4>Proposed agenda</h4>
@@ -24,5 +33,32 @@
   </div>
   {% endif %}
   {% endif %}
+  {% endif %}
+</div>
+
+<div class="grid_4 last">
+  <div class="box">
+  <h3>Members present</h3>
+  <ul>
+  {% for t in minutes.members_present.all %}
+  <li>{{t.person}}{% if t.office %}, {{t.office.title}}{%endif %}</li>
+  {% endfor %}
+  </ul>
+
+  {% if minutes.others_present %}
+  <h3>Others present</h3>
+  <ul>
+  {% for g in minutes.others_present.all %}
+  <li>{{g}}</li>
+  {% endfor %}
+  </ul>
+  <hr />
+  </div>
+  {% else %}
+  <hr />
+  </div>
+  {% endif %}
+</div>
+
 {% endblock %}
 

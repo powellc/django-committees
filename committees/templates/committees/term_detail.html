@@ -1,4 +1,4 @@
-{% extends "gov/base.html" %}
+{% extends "committees/base.html" %}
 {% block page-class %}gov{% endblock %}
 {% block title %}{{term}} at {% endblock %}
 
@@ -9,8 +9,8 @@
   </div>
 
   {% if term %}
-  <h3>Position: {{term.office.title}}</h3>
-  <p>{{term.start_date.year}} to {{term.end_date.year}}</p>
+  <h3>{{term.office.title}} of the {{term.office.group}}</h3>
+  <p>{{term.length}} year term beginning {{term.start.year}}</p>
   <h4>Currently held by</h4>
   <ul>
       <li>{{term.person}}</li>
