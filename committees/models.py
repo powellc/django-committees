@@ -7,7 +7,7 @@ from myutils.models import MarkupMixin
 from django.contrib.auth.models import User
 from django_extensions.db.models import TimeStampedModel, TitleSlugDescriptionModel
 from committees.managers import BoardManager, ActiveTermManager, ActiveGroupManager
-from schedule.models import Event
+from eventy.models import EventTime
 from simple_history.models import HistoricalRecords
 
 class GroupType(TitleSlugDescriptionModel):
@@ -181,14 +181,13 @@ class Person(models.Model):
     def get_absolute_url(self):
         return ('cm-person-detail', None, {'slug': self.slug})
 
-class Meeting(MarkupMixin, TimeStampedModel, Event):
+class Meeting(MarkupMixin, TimeStampedModel, EventTime):
     '''
     Meeting model.
 
     A general meeting model. 
     '''
     group = models.ForeignKey(Group)
-    location = models.CharField(_('Location'), blank=True, null=True, max_length=150)
     agenda = models.TextField(_('Agenda'), blank=True, null=True)
     rendered_agenda = models.TextField(_('Rendered agenda'), blank=True, null=True)
     business_arising=models.TextField(_('Business arising'), blank=True, null=True)
@@ -213,22 +212,6 @@ class Meeting(MarkupMixin, TimeStampedModel, Event):
     @models.permalink
     def get_absolute_url(self):
         return ('cm-meeting-detail', (), {'slug': self.group.slug, 'year': self.start.year, 'month': self.start.month, })
-
-    @property
-    def start_date(self):
-        return self.start.date
-
-    @property
-    def start_time(self):
-        return self.start.time
-
-    @property
-    def end_date(self):
-        return self.end.date
-
-    @property
-    def end_time(self):
-        return self.end.time
 
     def get_next_meeting(self):
         """Determines the next meeting"""
