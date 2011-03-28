@@ -20,10 +20,15 @@
 
   {{minutes.rendered_content|typogrify}}
   {% if object.get_next_meeting %}
-  <p>Next meeting at {{ object.get_next_meeting.start|naturalday }} at {{ object.get_next_meeting.start|time:"f a" }}.</p>
-  <p><a href="{{object.get_next_meeting.get_absolute_url}}">View next meeting</a></p>
+  <p><a href="{{object.get_next_meeting.get_absolute_url}}">Next meeting at {{ object.get_next_meeting.start|naturalday }} at {{ object.get_next_meeting.start|time:"f a" }}</a></p>
   {% endif %}
   {% if minutes.adjournment %}<p>Meeting adjourned at {{minutes.adjournment|time:"f a"}}.</p>{% endif %}
+
+  {% if minutes.signed %}
+  <p>Respectfully submitted,</p>
+  <p>{{ minutes.signed }} {% if minutes.signed.term_set.all %}{% for t in minutes.signed.term_set.all %}{% if forloop.first %}, {{t.office.title}}{% endif %}{% endfor %}{% endif %}</p>
+  <p>{{ minutes.signed_date|naturalday }}</p>
+  {% endif %}
 
   {% else %}
   {% if object.meeting.agenda %}
