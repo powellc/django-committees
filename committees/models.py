@@ -231,12 +231,13 @@ class Person(models.Model):
         (1, 'Male'),
         (2, 'Female'),
     )
-    first_name = models.CharField(_('first name'), blank=True, max_length=100)
-    middle_name = models.CharField(_('middle name'), blank=True, max_length=100)
-    last_name = models.CharField(_('last name'), blank=True, max_length=100)
-    slug = models.SlugField(_('slug'), unique=True)
+    first_name = models.CharField(_('First name'), blank=True, max_length=100)
+    middle_name = models.CharField(_('Middle name'), blank=True, max_length=100)
+    last_name = models.CharField(_('Last name'), blank=True, max_length=100)
+    title = models.CharField(_('Title'), blank=True, max_length=100)
+    slug = models.SlugField(_('Slug'), unique=True)
     user = models.ForeignKey(User, blank=True, null=True, help_text='If the person is an existing user of your site.')
-    gender = models.PositiveSmallIntegerField(_('gender'), choices=GENDER_CHOICES, blank=True, null=True)
+    gender = models.PositiveSmallIntegerField(_('Gender'), choices=GENDER_CHOICES, blank=True, null=True)
     member = models.BooleanField(_('Member'), default=True, help_text='Is this person a member of the organization?')
     phone = PhoneNumberField(_('Phone'), blank=True, null=True)
     email = models.EmailField(_('Email'), blank=True, null=True)
