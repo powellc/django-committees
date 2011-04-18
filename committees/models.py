@@ -2,12 +2,13 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 from django.contrib.localflavor.us.models import PhoneNumberField
-from myutils.models import MarkupMixin
-
 from django.contrib.auth.models import User
+from myutils.models import MarkupMixin
+from committees.managers import BoardManager, ActiveTermManager, ActiveGroupManager, ApprovedManager
+
 from django_extensions.db.models import TimeStampedModel, TitleSlugDescriptionModel
-from committees.managers import BoardManager, ActiveTermManager, ActiveGroupManager
 from eventy.models import EventTime
+from photologue.models import ImageModel, Photo
 from simple_history.models import HistoricalRecords
 
 class GroupType(TitleSlugDescriptionModel):
@@ -30,7 +31,6 @@ class GroupType(TitleSlugDescriptionModel):
     def get_absolute_url(self):
         return ('cm-group-type-detail', None, {'slug': self.slug})
 
-
 class Group(TimeStampedModel, TitleSlugDescriptionModel):
     '''Group model.
 
@@ -45,17 +45,26 @@ class Group(TimeStampedModel, TitleSlugDescriptionModel):
     adhoc=models.BooleanField(_('Ad-hoc'), default=False, help_text='Is this is an ad-hoc group?')
     members=models.ManyToManyField('Person', related_name='members', blank=True, null=True, help_text='Non-term limited members of the group.')
     past_members=models.ManyToManyField('Person', related_name='past_members', blank=True, null=True, help_text='Non-term limited members who have left the group')
-    deceased_members = models.ManyToManyField('Person', related_name='deceased_members', blank=True, null=True, help_text='Non-term limited members who have passed away')
+    #deceased_members = models.ManyToManyField('Person', related_name='deceased_members', blank=True, null=True, help_text='Non-term limited members who have passed away')
+    special_title=models.CharField(_('Special title'), max_length=255, blank=True, null=True, help_text='If the auto-generated name for the group makes no sense.')
+    ex_officio = models.BooleanField(_('Ex-Officio'), default=False, help_text='Does this group fall under the ex-officio officer rules?')
 
     objects=models.Manager()
     active_objects=ActiveGroupManager()
+
+    def __init__(self, *args, **kwargs):
+        super(Group, self).__init__(*args, **kwargs)
+        self._eo_members = []
 
     class Meta:
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
 
     def __unicode__(self):
-        return u'%s %s' % (self.title, self.type)
+        if self.special_title:
+            return u'%s' % self.special_title
+        else:
+            return u'%s %s' % (self.title, self.type)
 
     @models.permalink
     def get_absolute_url(self):
@@ -78,15 +87,43 @@ class Group(TimeStampedModel, TitleSlugDescriptionModel):
                 objects.append(t)
         return objects
 
+    @property
+    def exofficio_members(self):
+        if not self._eo_members:
+            if self.ex_officio:
+                for o in Office.objects.filter(ex_officio=True):
+                    if o.current and (o.current not in self.current_terms):
+                        self._eo_members.append(o.current)
+        return self._eo_members
+
+class GroupPhoto(ImageModel):
+    '''Group photo model.
+
+    Represents a photo of a governing group at a specific time.'''
+    group=models.ForeignKey(Group)
+    year=models.IntegerField(_('Year'), max_length=4)
+    caption=models.TextField(_('Caption'), blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('Group photo')
+        verbose_name_plural = _('Group photos')
+        get_latest_by='year'
+
+    def __unicode__(self):
+        return u'%s photo of %s' % (self.year, self.group)
+    
 class Office(TimeStampedModel, TitleSlugDescriptionModel):
     '''
     Office model.
 
-    Holds all the various office types, mostly just drawn from django-extension mixins. Designed to take care of pres, vp, sec, tres type positions.
+    Holds all the various office types, mostly just drawn from django-extension 
+    mixins. Designed to take care of pres, vp, sec, tres type positions.
 
     '''
     group=models.ForeignKey(Group)
     order=models.IntegerField(_('Office order'), max_length=2)
+    ex_officio=models.BooleanField(_('Ex-Officio'), default=False,
+    help_text='An ex-officio office is, by default, a member of all committees, unless stated.')
     
     class Meta:
         verbose_name = _('Office')
@@ -96,6 +133,33 @@ class Office(TimeStampedModel, TitleSlugDescriptionModel):
     def __unicode__(self):
         return u'%s of %s' % (self.title, self.group)
 
+    @property
+    def previous(self):
+        current = past = None
+        terms = self.term_set.all().order_by('-end')
+        i=1
+        for t in terms:
+            try:
+                past = terms[i]
+            except:
+                return None
+            if (t.person != past.person) and not t.active:
+                return past
+            i+=1
+        return self.term_set.all().order_by('-end')[1]
+
+    @property
+    def current(self):
+        terms =[]
+        for t in self.term_set.all().order_by('-end'):
+            if t.active:
+                terms.append(t)
+        if len(terms) == 1:
+            return terms[0]
+        else:
+            for t in terms:
+                t.office.title = "Co-"+t.office.title
+            return terms
 
 class Term(TimeStampedModel):
     group = models.ForeignKey(Group)
@@ -132,6 +196,18 @@ class Term(TimeStampedModel):
         else: return None
     
     @property
+    def tenure(self):
+        tenure = 0
+        terms = Term.objects.filter(person=self.person)
+        for t in terms:
+            if t.length:
+                tenure += self.length
+            elif not t.end:
+                tenure += datetime.now().year - self.start.year
+
+        return tenure
+
+    @property
     def officer(self):
         if self.office: return True
         else: return False
@@ -164,6 +240,8 @@ class Person(models.Model):
     member = models.BooleanField(_('Member'), default=True, help_text='Is this person a member of the organization?')
     phone = PhoneNumberField(_('Phone'), blank=True, null=True)
     email = models.EmailField(_('Email'), blank=True, null=True)
+    photo = models.ForeignKey(Photo, blank=True, null=True)
+    bio = models.TextField(_('Biography'), blank=True, null=True)
 
     class Meta:
         verbose_name = _('person')
@@ -218,7 +296,7 @@ class Meeting(MarkupMixin, TimeStampedModel, EventTime):
 
         if not self._next:
             try:
-                qs = Meeting.objects.filter(calendar=self.calendar).exclude(id__exact=self.id)
+                qs = Meeting.objects.filter(event__calendar=self.event.calendar).exclude(id__exact=self.id)
                 meeting= qs.filter(start__gte=self.start).order_by('start')[0]
             except (Meeting.DoesNotExist, IndexError):
                 meeting = None
@@ -231,7 +309,7 @@ class Meeting(MarkupMixin, TimeStampedModel, EventTime):
 
         if not self._previous:
             try:
-                qs = Meeting.objects.all().exclude(id__exact=self.id)
+                qs = Meeting.objects.filter(event__calendar=self.event.calendar).exclude(id__exact=self.id)
                 meeting= qs.filter(start__lte=self.start).order_by('-start')[0]
             except (Meeting.DoesNotExist, IndexError):
                 meeting = None
@@ -251,6 +329,8 @@ class Minutes(MarkupMixin, TimeStampedModel):
     signed_date = models.DateField(_('Signed date'), default=datetime.now())
     draft = models.BooleanField(_('Draft'), default=True)
 
+    objects = models.Manager()
+    approved_objects = ApprovedManager()
     history = HistoricalRecords()
 
     class Meta:

@@ -14,6 +14,7 @@ class TermAdmin(admin.ModelAdmin):
 admin.site.register(Term, TermAdmin)
     
 admin.site.register(GroupType)
+admin.site.register(GroupPhoto)
 admin.site.register(Group)
 admin.site.register(Office)
 admin.site.register(Person)

@@ -2,21 +2,19 @@
 {% block page-class %}gov{% endblock %}
 {% block title %}{{object}} at {% endblock %}
 
-{% block content %}
 {% load humanize markup typogrify %}
+
+{% block body %}
   <div class="grid_12 page">
     <h2>Governance</h2>
-    <ul class="governance subnav {{object.slug}}">
-        <li class="board">Governing board</li>
-        <li class="comm">Committees</li>
-        <li class="meet">Meetings</li>
-        <li class="min">Minutes</li>
-    </ul>
   </div>
 
-  {% if object %}
-  <h3>{{object}}</h3>
-  {{object.description|typogrify|markdown}}
+  <div class="grid_4">
+    <h3>{{object}}</h3>
+    {{object.description|typogrify|markdown}}
+  </div>
+
+  <div class="grid_4">
   {% if members or object.members %}
   <h3>Members</h3>
   <ul class="board">
@@ -32,6 +30,17 @@
     {% endif %}
   </ul>
   {% endif %}
-  {% endif %}
+</div>
+
+<div class="grid_4 last">
+    {% if object.meeting_set.all %}
+    <h3>Meetings of the {{object}}</h3>
+    <ul>
+    {% for m in object.meeting_set.all|dictsortreversed:"start" %}
+    <li><a href="{{m.get_absolute_url}}">{{m.start|naturalday}}</a></li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
 {% endblock %}
 

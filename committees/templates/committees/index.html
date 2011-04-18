@@ -1,24 +1,50 @@
 {% extends "committees/base.html" %}
 {% block page-class %}gov{% endblock %}
 {% block title %}Governance at {% endblock %}
+{% load humanize markup typogrify committee_tags eventy_tags %}
 
-{% block content %}
-{% load humanize markup typogrify committee_tags %}
+{% block body %}
   <div class="grid_12">
 	  <h2>Governance</h2>
   </div>
 
+  <div class="grid_7">
     {% get_committee_groups active order 10 as board %}
-    {% if board %}
     <h3>{{board}}</h3>
+    <img class="governance" src="{{board.groupphoto_set.latest.get_display_url}}" />
+    {{board.groupphoto_set.latest.caption|typogrify|markdown}}
+    {{board.description|typogrify|markdown}}
+
+  </div>
+
+  <div class="grid_5 last">
+    <h3>Members</h3>
     {% for t in board.current_terms %}
     {% if forloop.first %}<ul class="board">{% endif %}
         <li>{% if t.office %} <span class="office">{{t.office.title}}</span><br/> {% endif %}<span class="person">{{t.person}}</span>{% if t.alternate %} <span class="alt">Alt.</span>{% endif %}</li>
     {% if forloop.last %}</ul>{% endif %}
     {% endfor %}
-    {% endif %}
+    <p><a href="{{board.get_absolute_url}}">View agendas and minutes</a></p>
 
-  {% if objects %}
+  </div>
+
+  <div class="grid_12 last">
+
+    <h3>Committees</h3>
+    {% get_committee_groups active order 20 as committees %}
+    {% if committees %}
+    {% for c in committees %}
+    <dl class="committee" id="c.slug">
+      <dt><a href="{{c.get_absolute_url}}">{{c}}</a></dt>
+      {% for t in c.current_terms %}
+      <dd class="{{t.office.title}} member"><em>{{t.office.title}}&nbsp;{{t.person}}</em></dd>
+      {% endfor %}
+      {% for p in c.members.all %}
+      <dd class="member">{{p}}</dd>
+      {% endfor %}
+    </dl>
+  {% endfor %}
   {% endif %}
+</div>
 {% endblock %}
 

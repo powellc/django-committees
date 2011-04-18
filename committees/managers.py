@@ -19,3 +19,9 @@ class ActiveGroupManager(Manager):
 
     def get_query_set(self):
         return super(ActiveGroupManager, self).get_query_set().filter(active=True)
+
+class ApprovedManager(Manager):
+    """Returns all currently active groups."""
+
+    def get_query_set(self):
+        return super(ApprovedManager, self).get_query_set().filter(draft=False)

@@ -10,7 +10,7 @@
 
   <div class="grid_8" >
   {% if object %}
-  <h3>{{object.title}} {% if object.minutes_set.all %}Minutes{% else %}Agenda{% endif %}</h3>
+  <h3>{{object.title}} {% if object.minutes_set.all %}Minutes{% else %}Agenda{% endif %} of the {{object.group}}</h3>
   <h3>{{object.start|naturalday}} {{object.start|time:"f a"}}</h3>
 
   {% get_committee_minutes for object as minutes %}

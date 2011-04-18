@@ -7,6 +7,46 @@ from committees.models import Group
 
 register = template.Library()
 
+@register.tag
+def get_office(parser, token):
+    """
+    Gets an office if it exists
+
+    Syntax::
+
+    {% get_office [slug] as [var_name] %}
+
+    Example usage::
+
+    {% get_group 'president' as prez %}
+
+    """
+    args = token.split_contents()
+    argc = len(args)
+
+    try:
+        assert argc == 4
+    except AssertionError:
+        raise template.TemplateSyntaxError('Invalid get_office syntax.')
+    # determine what parameters to use
+    slug = var_name = None
+    if argc == 4:
+        t, slug, a, var_name = args
+    return GetOfficeNode(slug=slug, var_name=var_name)
+
+class GetOfficeNode(template.Node):
+    def __init__(self, slug, var_name):
+        self.slug = slug
+        self.var_name = var_name
+
+    def render(self, context):
+        try:
+            office = Office.objects.get(slug=self.slug)
+        except:
+            office = None
+        context[self.var_name] = office
+        return ''
+
 class GetGroupsNode(template.Node):
     def __init__(self, status, order, var_name):
         self.var_name = var_name
