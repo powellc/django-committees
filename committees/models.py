@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 from django.contrib.localflavor.us.models import PhoneNumberField
 from django.contrib.auth.models import User
-from myutils.models import MarkupMixin
+from markup_mixin.models import MarkupMixin
 from committees.managers import BoardManager, ActiveTermManager, ActiveGroupManager, ApprovedManager
 
 from django_extensions.db.models import TimeStampedModel, TitleSlugDescriptionModel
