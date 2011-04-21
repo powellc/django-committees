@@ -8,7 +8,7 @@ setup(
     install_requires = [
         'django-markup-mixin',
         'django-extensions',
-        'django-simple-history',
+        'simple_history',
         'django-photologue',
         'django-eventy',],
 
