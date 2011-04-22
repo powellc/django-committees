@@ -1,9 +1,10 @@
 import re
+import logging
 
 from django import template
 from django.conf import settings
 from django.db import models
-from committees.models import Group
+from committees.models import Group, Office
 
 register = template.Library()
 
@@ -18,7 +19,7 @@ def get_office(parser, token):
 
     Example usage::
 
-    {% get_group 'president' as prez %}
+    {% get_office 'president' as prez %}
 
     """
     args = token.split_contents()
@@ -41,10 +42,10 @@ class GetOfficeNode(template.Node):
 
     def render(self, context):
         try:
-            office = Office.objects.get(slug=self.slug)
+            self.office = Office.objects.get(slug=self.slug)
         except:
-            office = None
-        context[self.var_name] = office
+            self.office = None
+        context[self.var_name] = self.office
         return ''
 
 class GetGroupsNode(template.Node):

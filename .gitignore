@@ -1,3 +1,5 @@
+dist
+*.egg-info
 *.swp
 *.swo
 *.pyc

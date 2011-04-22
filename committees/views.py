@@ -45,6 +45,8 @@ def term_detail(request, slug, office_slug, start_year=None):
     if start_year:
         term = Term.objects.get(office__slug=office_slug, group__slug=slug,  start__year=start_year)
     else:
-        term = Term.objects.filter(office__slug=office_slug, group__slug=slug ).latest()
+        terms = Term.objects.filter(office__slug=office_slug, group__slug=slug )
+        if len(terms) == 1:
+            term = terms[0]
     return render_to_response('committees/term_detail.html', locals(),
                   context_instance=RequestContext(request))
