@@ -9,13 +9,12 @@
   </div>
 
   <div class="grid_8" >
+  {% get_committee_minutes for object as minutes %}
   {% if object %}
-  <h3>{{object.title}} {% if object.minutes_set.all %}Minutes{% else %}Agenda{% endif %} of the {{object.group}}</h3>
+  <h3>{{object.title}} {% if minutes and board_member %}{% if minutes.draft %}DRAFT{% endif %} Minutes{% else %}Agenda{% endif %} of the {{object.group}}</h3>
   <h3>{{object.start|naturalday}} {{object.start|time:"f a"}}</h3>
 
-  {% get_committee_minutes for object as minutes %}
-
-  {% if minutes %}  
+  {% if minutes and board_member %}  
   {% if minutes.call_to_order %}<p>Meeting called to order at {{minutes.call_to_order|time:"f a"}} in {{object.location}}.</p>{% endif%}
 
   {{minutes.rendered_content|typogrify}}
@@ -33,8 +32,12 @@
   {% else %}
   {% if object.meeting.agenda %}
   <div class="agenda">
+  {% if object.meeting.agenda %}
   <h4>Proposed agenda</h4>
   {{object.meeting.agenda|typogrify|markdown}}
+  {% else %}
+  <p>This meeintg does not yet have an agenda set.</p>
+  {% endif %}
   </div>
   {% endif %}
   {% endif %}
@@ -42,6 +45,7 @@
 </div>
 
 <div class="grid_4 last">
+    {% if minutes and board_member %}
   <div class="box">
   <h3>Members present</h3>
   <ul>
@@ -62,6 +66,7 @@
   {% else %}
   <hr />
   </div>
+  {% endif %}
   {% endif %}
 </div>
 

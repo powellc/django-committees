@@ -17,7 +17,7 @@
 
   </div>
 
-  <div class="grid_5 last">
+  <div class="grid_2 ">
     <h3>Members</h3>
     {% for t in board.current_terms %}
     {% if forloop.first %}<ul class="board">{% endif %}
@@ -25,7 +25,14 @@
     {% if forloop.last %}</ul>{% endif %}
     {% endfor %}
     <p><a href="{{board.get_absolute_url}}">View agendas and minutes</a></p>
-
+  </div>
+  <div class="grid_3 last">
+    <h3>Meetings</h3>
+    <ul>
+    {% for m in past_meetings %}
+    <li><a href="{{a.get_absolute_url}}">{{m.start|naturalday}}</a></li>
+    {% endfor %}
+    </ul>
   </div>
 
   <div class="grid_12 last">
