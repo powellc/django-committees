@@ -15,6 +15,8 @@ def index(request):
 def group_detail(request, slug):
     object=Group.objects.get(slug=slug)
     members=object.term_set.filter(start__lte=datetime.now(), end__gte=datetime.now())
+    meetings=object.meeting_set.filter(start__gte=datetime.now())
+
     return render_to_response('committees/group_detail.html', locals(),
                               context_instance=RequestContext(request))
 
@@ -32,9 +34,13 @@ def group_meeting_archive_year(request, slug, year):
 
 def group_meeting_detail(request, slug, year, month):
     object = Meeting.objects.get(group__slug=slug, start__year=year, start__month=month)
+    if request.user.is_authenticated():
+        if request.user.person_set.all()[0].on_board:
+            board_member=True
     return render_to_response('committees/meeting_detail.html', locals(),
                   context_instance=RequestContext(request))
-    
+
+ 
 def minutes_detail(request, slug, year, month):
     meeting = Meeting.objects.get(meeting__group__slug=slug, start__year=year, start__month=month)
     object = Minutes.objects.get(meeting=meeting)
