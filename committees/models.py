@@ -256,9 +256,16 @@ class Person(models.Model):
     def full_name(self):
         return u'%s %s' % (self.first_name, self.last_name)
 
+    @property
+    def on_board(self):
+        for t in self.term_set.all():
+            if t.group.order == 10:
+                return True
+
     @models.permalink
     def get_absolute_url(self):
         return ('cm-person-detail', None, {'slug': self.slug})
+
 
 class Meeting(MarkupMixin, TimeStampedModel, EventTime):
     '''
