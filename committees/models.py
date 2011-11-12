@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.localflavor.us.models import PhoneNumberField
 from django.contrib.auth.models import User
 from markup_mixin.models import MarkupMixin
