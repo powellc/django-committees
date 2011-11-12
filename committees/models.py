@@ -182,9 +182,9 @@ class Term(TimeStampedModel):
     @property
     def active(self):
         status=False
-        if self.start <= datetime.now().date():
+        if self.start >= datetime.now().date():
             if self.end:
-                if self.end >= datetime.now().date():
+                if self.end <= datetime.now().date():
                     status = True
             else:
                 status=True
