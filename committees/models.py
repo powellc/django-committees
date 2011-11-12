@@ -328,8 +328,8 @@ class Meeting(MarkupMixin, TimeStampedModel, EventTime):
 class Minutes(MarkupMixin, TimeStampedModel):
     meeting = models.ForeignKey(Meeting)
     call_to_order = models.TimeField(_('Call to order'), blank=True, null=True)
-    members_present = models.ManyToManyField(Term)
-    others_present = models.ManyToManyField(Person)
+    members_present = models.ManyToManyField(Term, related_name='members_present')
+    others_present = models.ManyToManyField(Person, related_name='others_present')
     members_present_new = models.ManyToManyField(Person, related_name='members')
     guests_present = models.ManyToManyField(Person, related_name='guests', blank=True, null=True)
     content = models.TextField(_('Content'))
