@@ -1,5 +1,5 @@
 django-committees
-==============
+===================
 :author: Colin Powell
 :date: 2011-02-19
 :by: One Cardinal Web Development

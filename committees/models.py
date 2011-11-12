@@ -360,7 +360,7 @@ class Minutes(MarkupMixin, TimeStampedModel):
 class Attachment(TimeStampedModel):
     upload_to = lambda inst, fn: 'attach/%s/%s/%s' % (datetime.now().year, inst.minutes.meeting.group.slug, fn)
 
-    minutes = models.ForeignKey(Article, related_name='attachments')
+    minutes = models.ForeignKey(Minutes, related_name='attachments')
     attachment = models.FileField(upload_to=upload_to)
     title = models.CharField(_('Title'), max_length=255)
     description = models.TextField(_('Description'), blank=True, null=True)
