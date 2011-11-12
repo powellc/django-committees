@@ -357,3 +357,32 @@ class Minutes(MarkupMixin, TimeStampedModel):
     def get_absolute_url(self):
         return ('cm-minutes-detail', (), {'slug':self.meeting.meeting.group.slug, 'year': self.meeting.meeting.start.year, 'month': self.meeting.meeting.event.start.month, })
 
+class Attachment(TimeStampedModel):
+    upload_to = lambda inst, fn: 'attach/%s/%s/%s' % (datetime.now().year, inst.minutes.meeting.group.slug, fn)
+
+    minutes = models.ForeignKey(Article, related_name='attachments')
+    attachment = models.FileField(upload_to=upload_to)
+    title = models.CharField(_('Title'), max_length=255)
+    description = models.TextField(_('Description'), blank=True, null=True)
+
+    class Meta:
+        ordering = ('-minutes', 'id')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.minutes, self.title)
+
+    @property
+    def filename(self):
+        return self.attachment.name.split('/')[-1]
+
+    @property
+    def content_type_class(self):
+        mt = mimetypes.guess_type(self.attachment.path)[0]
+        if mt:
+            content_type = mt.replace('/', '_')
+        else:
+            # assume everything else is text/plain
+            content_type = 'text_plain'
+
+        return content_type
+

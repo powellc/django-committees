@@ -1,6 +1,12 @@
 from django.contrib import admin
 from committees.models import *
 
+class AttachmentInline(admin.TabularInline):
+    model = Attachment
+    extra = 5
+    max_num = 15
+
+
 class TermAdmin(admin.ModelAdmin):
     list_display = ('person', 'office', 'group', 'start', 'end', 'alternate','is_active',)
     search_fields = ('person','group',)
@@ -12,6 +18,15 @@ class TermAdmin(admin.ModelAdmin):
     is_active.boolean = True
 
 admin.site.register(Term, TermAdmin)
+
+class MinutesAdmin(admin.ModelAdmin):
+    list_display = ('group', 'meeting', 'draft', 'call_to_order', 'adjournment', 'signed', 'signed_date',)
+    search_fields = ('content','members_present','meeting',)
+    inlines = [
+        AttachmentInline,
+    ]
+
+admin.site.register(Minutes, MinutesAdmin)
     
 admin.site.register(GroupType)
 admin.site.register(GroupPhoto)
@@ -19,4 +34,3 @@ admin.site.register(Group)
 admin.site.register(Office)
 admin.site.register(Person)
 admin.site.register(Meeting)
-admin.site.register(Minutes)
