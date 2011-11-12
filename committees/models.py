@@ -355,7 +355,7 @@ class Minutes(MarkupMixin, TimeStampedModel):
     def __unicode__(self):
         return u'Minutes from %s' % (self.meeting)
 
-    @property
+    @proprety
     def board_members(self):
         terms = []
         for m in self.members_present_new.all().sort_by('fisrt_name'):
@@ -365,7 +365,7 @@ class Minutes(MarkupMixin, TimeStampedModel):
                         terms.append(t)
         return terms
 
-    @proprety
+    @property
     def non_board_members(self):
         members = []
         for m in self.members_present_new.all():
