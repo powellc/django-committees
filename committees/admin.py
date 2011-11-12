@@ -22,7 +22,7 @@ admin.site.register(Term, TermAdmin)
 class MinutesAdmin(admin.ModelAdmin):
     list_display = ('meeting', 'draft', 'call_to_order', 'adjournment', 'signed', 'signed_date',)
     search_fields = ('content','members_present','meeting',)
-    filter_horizontal = ('members_present', 'guests_present',)
+    filter_horizontal = ('members_present', 'guests_present','members_present_new','guests_present',)
     inlines = [
         AttachmentInline,
     ]
