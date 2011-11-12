@@ -355,6 +355,29 @@ class Minutes(MarkupMixin, TimeStampedModel):
     def __unicode__(self):
         return u'Minutes from %s' % (self.meeting)
 
+    @property
+    def board_members(self):
+        terms = []
+        for m in self.members_present_new.all().sort_by('fisrt_name'):
+            if m.term_set.all():
+                for t in m.term_set.all():
+                    if t.group == self.meeting.group and t.active:
+                        terms.append(t)
+        return terms
+
+    @proprety
+    def non_board_members(self):
+        members = []
+        for m in self.members_present_new.all():
+            in_terms=False
+            for t in self.board_members:
+                if t.person == m:
+                    in_terms = True
+            if not in_terms:
+                members.append(m)
+            in_terms=False
+        return members
+
     @models.permalink
     def get_absolute_url(self):
         return ('cm-minutes-detail', (), {'slug':self.meeting.meeting.group.slug, 'year': self.meeting.meeting.start.year, 'month': self.meeting.meeting.event.start.month, })
